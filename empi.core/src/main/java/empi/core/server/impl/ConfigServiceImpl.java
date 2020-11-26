@@ -249,6 +249,9 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public CommonResult<Object> operationSelectionProperty(List<MatchProperty> matchProperties) {
+        //纳排队列 纳排数据 存放为 json key value
+
+        //纳排队列 要求
         return null;
     }
 
