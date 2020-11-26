@@ -1,0 +1,8 @@
+server:
+  port: 9000
+autoconfig:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://192.168.174.135:3306/empi
+    username: root
+    password: 123456
