@@ -88,6 +88,9 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="queryMaxSort" resultType="Integer">
+    select max(sort) from empi.match_property where is_deleted=0
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />

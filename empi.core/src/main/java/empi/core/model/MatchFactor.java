@@ -89,8 +89,8 @@ public class MatchFactor implements Serializable {
         return threshold;
     }
 
-    public void setThreshold(BigDecimal threshold) {
-        this.threshold = threshold;
+    public void setThreshold(BigDecimal i) {
+        this.threshold = i;
     }
 
     public Date getCreateTime() {

@@ -85,6 +85,10 @@
   <sql id="Blob_Column_List">
     match_function, match_condition
   </sql>
+
+  <select id="selectMaxSort" resultType="Integer">
+   select  max(sort) from empi.match_factor
+  </select>
   <select id="selectByExampleWithBLOBs" parameterType="empi.core.model.MatchFactorExample" resultMap="ResultMapWithBLOBs">
     select
     <if test="distinct">
@@ -140,11 +144,7 @@
       is_deleted, sort, property_code, 
       property_name, match_function, match_condition
       )
-    values (#{id,jdbcType=INTEGER}, #{propertyId,jdbcType=INTEGER}, #{positiveGrede,jdbcType=INTEGER}, 
-      #{negativeGrade,jdbcType=INTEGER}, #{threshold,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{createBy,jdbcType=INTEGER}, #{lastUpdateTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=INTEGER}, 
-      #{isDeleted,jdbcType=SMALLINT}, #{sort,jdbcType=INTEGER}, #{propertyCode,jdbcType=VARCHAR}, 
-      #{propertyName,jdbcType=VARCHAR}, #{matchFunction,jdbcType=LONGVARCHAR}, #{matchCondition,jdbcType=LONGVARCHAR}
+    values (#{id,jdbcType=INTEGER}, #{propertyId,jdbcType=INTEGER}, #{positiveGrede,jdbcType=INTEGER}, #{negativeGrade,jdbcType=INTEGER}, #{threshold,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=INTEGER}, #{lastUpdateTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=INTEGER}, #{isDeleted,jdbcType=SMALLINT}, #{sort,jdbcType=INTEGER}, #{propertyCode,jdbcType=VARCHAR}, #{propertyName,jdbcType=VARCHAR}, #{matchFunction,jdbcType=LONGVARCHAR}, #{matchCondition,jdbcType=LONGVARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="empi.core.model.MatchFactor">
@@ -197,50 +197,35 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
+      <if test="id != null"> #{id,jdbcType=INTEGER},
       </if>
-      <if test="propertyId != null">
-        #{propertyId,jdbcType=INTEGER},
+      <if test="propertyId != null"> #{propertyId,jdbcType=INTEGER},
       </if>
-      <if test="positiveGrede != null">
-        #{positiveGrede,jdbcType=INTEGER},
+      <if test="positiveGrede != null"> #{positiveGrede,jdbcType=INTEGER},
       </if>
-      <if test="negativeGrade != null">
-        #{negativeGrade,jdbcType=INTEGER},
+      <if test="negativeGrade != null"> #{negativeGrade,jdbcType=INTEGER},
       </if>
-      <if test="threshold != null">
-        #{threshold,jdbcType=DECIMAL},
+      <if test="threshold != null"> #{threshold,jdbcType=DECIMAL},
       </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
+      <if test="createTime != null"> #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="createBy != null">
-        #{createBy,jdbcType=INTEGER},
+      <if test="createBy != null"> #{createBy,jdbcType=INTEGER},
       </if>
-      <if test="lastUpdateTime != null">
-        #{lastUpdateTime,jdbcType=TIMESTAMP},
+      <if test="lastUpdateTime != null"> #{lastUpdateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateBy != null">
-        #{updateBy,jdbcType=INTEGER},
+      <if test="updateBy != null"> #{updateBy,jdbcType=INTEGER},
       </if>
-      <if test="isDeleted != null">
-        #{isDeleted,jdbcType=SMALLINT},
+      <if test="isDeleted != null"> #{isDeleted,jdbcType=SMALLINT},
       </if>
-      <if test="sort != null">
-        #{sort,jdbcType=INTEGER},
+      <if test="sort != null"> #{sort,jdbcType=INTEGER},
       </if>
-      <if test="propertyCode != null">
-        #{propertyCode,jdbcType=VARCHAR},
+      <if test="propertyCode != null"> #{propertyCode,jdbcType=VARCHAR},
       </if>
-      <if test="propertyName != null">
-        #{propertyName,jdbcType=VARCHAR},
+      <if test="propertyName != null"> #{propertyName,jdbcType=VARCHAR},
       </if>
-      <if test="matchFunction != null">
-        #{matchFunction,jdbcType=LONGVARCHAR},
+      <if test="matchFunction != null"> #{matchFunction,jdbcType=LONGVARCHAR},
       </if>
-      <if test="matchCondition != null">
-        #{matchCondition,jdbcType=LONGVARCHAR},
+      <if test="matchCondition != null"> #{matchCondition,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>

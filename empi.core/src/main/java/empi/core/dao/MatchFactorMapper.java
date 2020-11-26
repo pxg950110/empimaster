@@ -33,4 +33,6 @@ public interface MatchFactorMapper {
     int updateByPrimaryKeyWithBLOBs(MatchFactor record);
 
     int updateByPrimaryKey(MatchFactor record);
+
+    Integer selectMaxSort();
 }

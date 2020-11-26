@@ -27,4 +27,6 @@ public interface MatchPropertyMapper {
     int updateByPrimaryKeySelective(MatchProperty record);
 
     int updateByPrimaryKey(MatchProperty record);
+
+    Integer queryMaxSort();
 }

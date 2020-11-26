@@ -11,6 +11,7 @@ import java.util.Map;
 
 import empi.core.model.MatchFactor;
 import empi.core.model.MatchProperty;
+import empi.core.utils.CommonResult;
 
 public interface ConfigService {
     
@@ -18,14 +19,14 @@ public interface ConfigService {
      * 获取 所有属性
      * @return
      */
-    public List<MatchProperty> getAllMatchProperty();
+    public CommonResult<Object> getAllMatchProperty();
 
     /**
      * 添加属性 或修改属性
      * @param matchProperty
      * @return  true 返回添加或者修改属性 
      */
-    public boolean opeationMatchProperty(MatchProperty matchProperty);
+    public CommonResult<Object> opeationMatchProperty(MatchProperty matchProperty);
 
     
     /**
@@ -33,20 +34,20 @@ public interface ConfigService {
      * @param matchFactor
      * @return
      */
-    public boolean operationMatchFactor(MatchFactor matchFactor);
+    public CommonResult<Object> operationMatchFactor(MatchFactor matchFactor);
 
     /**
      * 操作多个分值配置项
      * @param matchFactors
      * @return
      */
-    public boolean  operationMatchFactor(List<MatchFactor> matchFactors);
+    public CommonResult<Object>  operationMatchFactor(List<MatchFactor> matchFactors);
 
     /**
      * 获取所有分值配置项
      * @return
      */
-    public List<MatchFactor> getAllMatchFator();
+    public CommonResult<Object> getAllMatchFator();
 
 
     //*************纳排相关操作****************** */
@@ -56,14 +57,14 @@ public interface ConfigService {
      * @param matchProperties
      * @return
      */
-    public  boolean  operationSelectionProperty(List<MatchProperty> matchProperties);
+    public  CommonResult<Object>  operationSelectionProperty(List<MatchProperty> matchProperties);
 
 
     /**
      * 获取所有纳排筛选属性
      * @return
      */
-    public List<MatchProperty> getAllSelectionProperty();
+    public CommonResult<Object> getAllSelectionProperty();
 
 
     /**
@@ -72,12 +73,12 @@ public interface ConfigService {
      * @param grade
      * @return
      */
-    public boolean setEmpiconfig(String  code ,String value); 
+    public CommonResult<Object> setEmpiconfig(String  code ,String value); 
 
 
     /**
      * 获取empi的配置
      * @return
      */
-    public Map<String,Object> getEmpiConfig(); 
+    public CommonResult<Object> getEmpiConfig(); 
 }
