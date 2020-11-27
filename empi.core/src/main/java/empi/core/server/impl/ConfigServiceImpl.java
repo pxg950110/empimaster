@@ -1,10 +1,8 @@
 package empi.core.server.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -247,7 +245,8 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public CommonResult<Object> operationSelectionProperty(List<MatchProperty> matchProperties) {
         //纳排队列 纳排数据 存放为 json key value
-
+        //
+        Map<String ,Object> map=new HashMap<>();
         //纳排队列 要求
         return null;
     }
