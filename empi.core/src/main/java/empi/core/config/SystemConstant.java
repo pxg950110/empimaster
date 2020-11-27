@@ -27,8 +27,4 @@ public class SystemConstant {
     public final static String EMPI_SECONDARY_KEY = "EMPI_SECONDARY_KEY";
     //姓名匹配规则  ZH中文 EN英文 PY 拼音码
     public final static String EMPI_NAME_KEY = "EMPI_NAME_KEY";
-//    public final static  String  EMPI_SELECTION_KEY="EMPI_SELECTION_KEY";
-//    public final static  String  EMPI_SELECTION_KEY="EMPI_SELECTION_KEY";
-//    public final static  String  EMPI_SELECTION_KEY="EMPI_SELECTION_KEY";
-
 }
