@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class EmpiCoreApplication {
-    
+
     public static void main(String[] args) {
         SpringApplication.run(EmpiCoreApplication.class, args);
     }
-    
+
 }

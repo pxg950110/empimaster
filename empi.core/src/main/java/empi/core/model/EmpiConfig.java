@@ -6,7 +6,6 @@ import java.util.Date;
 
 public class EmpiConfig implements Serializable {
     private Integer id;
-
     @ApiModelProperty(value = "配置属性代码")
     private String configCode;
 

@@ -182,7 +182,6 @@ public class ConfigServiceImpl implements ConfigService {
                 matchFactor.setSort(oldMatchFactor.getSort());
                 matchFactorMapper.updateByPrimaryKey(matchFactor);
                 return CommonResult.commomResult("规则修改成功", HttpResultStatus.STATUS200);
-
             } else {
                 //新数据插入
                 if (matchFactor.getCreateBy() == null) {
@@ -195,6 +194,8 @@ public class ConfigServiceImpl implements ConfigService {
                 matchFactor.setLastUpdateTime(new Date());
                 //v1.0.0不加入函数和condition 配置匹配度为1
                 matchFactor.setThreshold(BigDecimal.valueOf(1));
+                matchFactor.setIsDeleted((short) 0);
+                matchFactorMapper.insert(matchFactor);
                 return CommonResult.commomResult("规则写入成功", HttpResultStatus.STATUS200);
             }
         } catch (Exception e) {
@@ -234,7 +235,7 @@ public class ConfigServiceImpl implements ConfigService {
         try {
             //查询状态有效的数据
             MatchFactorExample example = new MatchFactorExample();
-            example.createCriteria().andIsDeletedEqualTo((short) 1);
+            example.createCriteria().andIsDeletedEqualTo((short) 0);
             return CommonResult.commomResult(matchFactorMapper.selectByExample(example), HttpResultStatus.STATUS200);
         } catch (Exception e) {
             e.printStackTrace();
@@ -246,7 +247,26 @@ public class ConfigServiceImpl implements ConfigService {
     public CommonResult<Object> operationSelectionProperty(List<MatchProperty> matchProperties) {
         //纳排队列 纳排数据 存放为 json key value
         //
-        Map<String ,Object> map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
+        final boolean[] errorFlag = {false};
+        matchProperties.forEach(
+                matchProperty -> {
+                    if (StringUtils.isEmpty(matchProperty.getCode())) {
+                        errorFlag[0] = true;
+                    } else {
+                        map.put(matchProperty.getCode(), matchProperty.getName());
+                    }
+                }
+        );
+        //如果有code为空
+        if (errorFlag[0]) {
+            return CommonResult.commomResult("配置属性错误请检查", HttpResultStatus.STATUS500);
+        }
+        try {
+
+        } catch (Exception e) {
+
+        }
         //纳排队列 要求
         return null;
     }
