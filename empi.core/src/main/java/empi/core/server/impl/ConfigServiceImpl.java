@@ -1,26 +1,30 @@
 package empi.core.server.impl;
 
-import java.math.BigDecimal;
-import java.util.*;
-
+import com.alibaba.druid.sql.visitor.functions.If;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import empi.core.config.SystemConstant;
+import empi.core.dao.EmpiConfigMapper;
+import empi.core.dao.MatchFactorMapper;
+import empi.core.dao.MatchPropertyMapper;
+import empi.core.init.EmpiProtertyCache;
+import empi.core.model.*;
+import empi.core.server.ConfigService;
+import empi.core.utils.CommonResult;
+import empi.core.utils.CommonUtils;
+import empi.core.utils.HttpResultStatus;
+import empi.core.utils.ValueProperty;
+import empi.core.utils.apisample.ApiSample;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import springfox.documentation.spring.web.json.Json;
 
-import empi.core.dao.MatchFactorMapper;
-import empi.core.dao.MatchPropertyMapper;
-import empi.core.init.EmpiProtertyCache;
-import empi.core.model.MatchFactor;
-import empi.core.model.MatchFactorExample;
-import empi.core.model.MatchProperty;
-import empi.core.model.MatchPropertyExample;
-import empi.core.server.ConfigService;
-import empi.core.utils.CommonResult;
-import empi.core.utils.CommonUtils;
-import empi.core.utils.HttpResultStatus;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * @author chpxg
@@ -35,6 +39,9 @@ public class ConfigServiceImpl implements ConfigService {
     private MatchPropertyMapper matchPropertyMapper;
     @Autowired
     private MatchFactorMapper matchFactorMapper;
+
+    @Autowired
+    private EmpiConfigMapper empiConfigMapper;
 
     @Override
     public CommonResult<Object> getAllMatchProperty() {
@@ -54,7 +61,7 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public CommonResult<Object> opeationMatchProperty(MatchProperty matchProperty) {
+    public CommonResult<Object> operationMatchProperty(MatchProperty matchProperty) {
         try {
             // 判断属性是否存在
             MatchPropertyExample example = new MatchPropertyExample();
@@ -121,6 +128,11 @@ public class ConfigServiceImpl implements ConfigService {
             return CommonResult.commomResult(e.getMessage(), HttpResultStatus.STATUS500);
         }
 
+    }
+
+    @Override
+    public CommonResult<Object> deleteMatchProperty(MatchProperty matchProperty) {
+        return null;
     }
 
     @Override
@@ -229,6 +241,39 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
+    /**
+     * 删除单个属性配置分值
+     * @param matchFactor
+     * @return
+     */
+    @Override
+    public CommonResult<Object> deleteMatchFactor(MatchFactor matchFactor) {
+        if (matchFactor.getId() == null) {
+            if (StringUtils.isEmpty(matchFactor.getPropertyCode())) {
+                return CommonResult.commomResult("移除的属性不存在请确认", HttpResultStatus.STATUS500);
+            }
+            //通过code获取id
+            MatchFactorExample example = new MatchFactorExample();
+            example.createCriteria().andIsDeletedEqualTo((short) 0).andPropertyCodeEqualTo(matchFactor.getPropertyCode());
+            List<MatchFactor> matchFactors = matchFactorMapper.selectByExample(example);
+            if (matchFactors.size() == 0) {
+                return CommonResult.commomResult("移除的属性不存在请确认", HttpResultStatus.STATUS500);
+            }
+            matchFactor.setId(matchFactors.get(0).getId());
+        }
+        //通过id更新数据
+        //查询出数据
+        MatchFactor oldMatchFactor = matchFactorMapper.selectByPrimaryKey(matchFactor.getId());
+        //删除数据 更新is_deleted字段为错误
+        oldMatchFactor.setIsDeleted((short) 1);
+        oldMatchFactor.setUpdateBy(1);
+        oldMatchFactor.setLastUpdateTime(new Date());
+        //更新数据
+        matchFactorMapper.updateByPrimaryKey(oldMatchFactor);
+        //返回
+        return CommonResult.commomResult("配置属性移除[" + oldMatchFactor.getPropertyName() + "]成功", HttpResultStatus.STATUS200);
+    }
+
     @Override
     public CommonResult<Object> getAllMatchFator() {
         //获取所有的配置
@@ -246,15 +291,23 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public CommonResult<Object> operationSelectionProperty(List<MatchProperty> matchProperties) {
         //纳排队列 纳排数据 存放为 json key value
+        String uid = CommonUtils.uuid();
         //
-        Map<String, Object> map = new HashMap<>();
+        List<ValueProperty> valuePropertyArrayList = new ArrayList<>();
         final boolean[] errorFlag = {false};
         matchProperties.forEach(
                 matchProperty -> {
                     if (StringUtils.isEmpty(matchProperty.getCode())) {
                         errorFlag[0] = true;
+                    } else if (
+                            !EmpiProtertyCache.getPropertyMap().containsKey(matchProperty.getCode())
+                    ) {//不在配置属性中
+                        errorFlag[0] = true;
                     } else {
-                        map.put(matchProperty.getCode(), matchProperty.getName());
+                        valuePropertyArrayList.add(new ValueProperty(
+                                matchProperty.getCode(),
+                                matchProperty.getName() == null ? EmpiProtertyCache.getPropertyMap().get(matchProperty.getCode()) : matchProperty.getName()
+                        ));
                     }
                 }
         );
@@ -263,27 +316,216 @@ public class ConfigServiceImpl implements ConfigService {
             return CommonResult.commomResult("配置属性错误请检查", HttpResultStatus.STATUS500);
         }
         try {
-
+            // logInfo
+            log.info("{}==>配置属性为=>*{}*", uid, CommonUtils.ObjectToJSONString(valuePropertyArrayList));
+            // 生成 筛选属性的json
+            // 更新属性
+            //获取现有属性
+            EmpiConfigExample example = new EmpiConfigExample();
+            example.createCriteria().andConfigCodeEqualTo(SystemConstant.EMPI_SELECTION_KEY).andIsDeletedEqualTo(0);
+            EmpiConfig empiConfig = empiConfigMapper.selectByExample(example).get(0);
+            empiConfig.setValue(CommonUtils.ObjectToJSONString(valuePropertyArrayList));
+            empiConfig.setUpdateBy(1);
+            empiConfig.setUpdateTime(new Date());
+            empiConfigMapper.updateByPrimaryKey(empiConfig);
+            return CommonResult.commomResult("更新筛选属性成功", HttpResultStatus.STATUS200);
         } catch (Exception e) {
-
+            e.printStackTrace();
+            log.error(e.getMessage());
+            //错误返回
+            return CommonResult.commomResult(e.getMessage(), HttpResultStatus.STATUS500);
         }
-        //纳排队列 要求
-        return null;
     }
 
     @Override
     public CommonResult<Object> getAllSelectionProperty() {
-        return null;
+        EmpiConfigExample example = new EmpiConfigExample();
+        try {
+            example.createCriteria().andIsDeletedEqualTo(0).andConfigCodeEqualTo(SystemConstant.EMPI_SELECTION_KEY);
+            EmpiConfig empiConfig = empiConfigMapper.selectByExample(example).get(0);
+            JSONArray valueProperties = JSON.parseArray(empiConfig.getValue());
+            return CommonResult.commomResult(valueProperties, HttpResultStatus.STATUS200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return CommonResult.commomResult(e.getMessage(), HttpResultStatus.STATUS500);
+        }
     }
 
     @Override
-    public CommonResult<Object> setEmpiconfig(String code, String value) {
-        return null;
+    public CommonResult<Object> setEmpiconfig(String code, List<MatchProperty> matchProperties) {
+        if (code.equals(SystemConstant.EMPI_PRIMARY_KEY)) {
+            //设置主标识 只允许有一个
+            if (matchProperties.size() != 1) {
+                return CommonResult.commomResult("主标识只允许有一个", HttpResultStatus.STATUS500);
+            }
+            //
+            MatchProperty matchProperty = matchProperties.get(0);
+            if (!EmpiProtertyCache.getPropertyMap().containsKey(matchProperty.getCode())) {
+                return CommonResult.commomResult("配置的主标识不存在属性中", HttpResultStatus.STATUS500);
+            }
+            ValueProperty valueProperty = new ValueProperty(matchProperty.getCode(), matchProperty.getName() == null ? EmpiProtertyCache.getPropertyMap().get(matchProperty.getCode()) : matchProperty.getName());
+            List<ValueProperty> valueProperties = new ArrayList<>();
+            valueProperties.add(valueProperty);
+            //更新数据
+            EmpiConfigExample example = new EmpiConfigExample();
+            example.createCriteria().andConfigCodeEqualTo(SystemConstant.EMPI_PRIMARY_KEY).andIsDeletedEqualTo(0);
+            EmpiConfig empiConfig = empiConfigMapper.selectByExample(example).get(0);
+            //更新数据
+            empiConfig.setValue(CommonUtils.ObjectToJSONString(valueProperties));
+            empiConfig.setUpdateBy(1);
+            empiConfig.setUpdateTime(new Date());
+            empiConfig.setUpdateTime(new Date());
+            //更新数据
+            empiConfigMapper.updateByPrimaryKey(empiConfig);
+            return CommonResult.commomResult("更新主标识成功", HttpResultStatus.STATUS200);
+
+        } else if (code.equals(SystemConstant.EMPI_SECONDARY_KEY)) {//副标识设置
+
+
+            //
+            List<ValueProperty> valuePropertyArrayList = new ArrayList<>();
+            final boolean[] errorFlag = {false};
+            matchProperties.forEach(
+                    matchProperty -> {
+                        if (StringUtils.isEmpty(matchProperty.getCode())) {
+                            errorFlag[0] = true;
+                        } else if (
+                                !EmpiProtertyCache.getPropertyMap().containsKey(matchProperty.getCode())
+                        ) {//不在配置属性中
+                            errorFlag[0] = true;
+                        } else {
+                            valuePropertyArrayList.add(new ValueProperty(
+                                    matchProperty.getCode(),
+                                    matchProperty.getName() == null ? EmpiProtertyCache.getPropertyMap().get(matchProperty.getCode()) : matchProperty.getName()
+                            ));
+                        }
+                    }
+            );
+            //如果有code为空
+            if (errorFlag[0]) {
+                return CommonResult.commomResult("配置属性错误请检查", HttpResultStatus.STATUS500);
+            }
+            try {
+                // 生成 筛选属性的json
+                // 更新属性
+                //获取现有属性
+                EmpiConfigExample example = new EmpiConfigExample();
+                example.createCriteria().andConfigCodeEqualTo(SystemConstant.EMPI_SECONDARY_KEY).andIsDeletedEqualTo(0);
+                EmpiConfig empiConfig = empiConfigMapper.selectByExample(example).get(0);
+                empiConfig.setValue(CommonUtils.ObjectToJSONString(valuePropertyArrayList));
+                empiConfig.setUpdateBy(1);
+                empiConfig.setUpdateTime(new Date());
+                empiConfigMapper.updateByPrimaryKey(empiConfig);
+                return CommonResult.commomResult("更新副标识成功", HttpResultStatus.STATUS200);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                //错误返回
+                return CommonResult.commomResult(e.getMessage(), HttpResultStatus.STATUS500);
+            }
+        } else if (code.equals(SystemConstant.EMPI_NAME_KEY)) {//姓名格式
+
+            return null;
+        } else {
+            return CommonResult.commomResult("code错误", HttpResultStatus.STATUS500);
+        }
     }
 
     @Override
-    public CommonResult<Object> getEmpiConfig() {
-        return null;
+    public CommonResult<Object> getEmpiConfig(String code) {
+//        String key="";
+        if (code.equals(SystemConstant.EMPI_PRIMARY_KEY) || code.equals(SystemConstant.EMPI_SECONDARY_KEY)) {
+            //
+            EmpiConfigExample example = new EmpiConfigExample();
+            example.createCriteria().andIsDeletedEqualTo(0).andConfigCodeEqualTo(code);
+            EmpiConfig empiConfig = empiConfigMapper.selectByExample(example).get(0);
+            return CommonResult.commomResult(JSON.parseArray(empiConfig.getValue()), HttpResultStatus.STATUS200);
+        } else {
+            //暂不支持吧
+            return null;
+        }
     }
 
+
+    /**
+     * 生成调用api的json样例
+     * @return
+     */
+    @Override
+    public CommonResult<Object> createAPIJsonSample() {
+        Map<String, Object> map = new HashMap<>();
+        //  主标识
+        //生成primaryKey
+        //
+        EmpiConfigExample example = new EmpiConfigExample();
+        example.createCriteria().andIsDeletedEqualTo(0).andConfigCodeEqualTo(SystemConstant.EMPI_PRIMARY_KEY);
+        EmpiConfig empiConfig = empiConfigMapper.selectByExample(example).get(0);
+        //获取key
+        //生成属性值
+        List<ValueProperty> valueProperties = JSON.parseArray(empiConfig.getValue()).toJavaList(ValueProperty.class);
+        //生成key
+        ApiSample primarySample = new ApiSample(SystemConstant.EMPI_PRIMARY_KEY, valueProperties.get(0).getCode()
+                , valueProperties.get(0).getValue(), "");
+        // primaryKey
+        map.put(SystemConstant.EMPI_PRIMARY_KEY, primarySample);
+
+        //  副标识
+        //
+        EmpiConfigExample example1 = new EmpiConfigExample();
+        example1.createCriteria().andConfigCodeEqualTo(SystemConstant.EMPI_SECONDARY_KEY).andIsDeletedEqualTo(0);
+        EmpiConfig secondaryEmpiConfig = empiConfigMapper.selectByExample(example1).get(0);
+        log.info(CommonUtils.ObjectToJSONString(secondaryEmpiConfig));
+        //
+        List<ValueProperty> valuePropertieList = JSON.parseArray(secondaryEmpiConfig.getValue()).toJavaList(ValueProperty.class);
+        //
+//        map.put("secondaryKey","");
+        //
+        List<ApiSample> secondarySamples = new ArrayList<>();
+        valuePropertieList.forEach(
+                valueProperty1 -> {
+                    secondarySamples.add(new ApiSample(SystemConstant.EMPI_SECONDARY_KEY, valueProperty1.getCode(),
+                            valueProperty1.getValue(), ""));
+                }
+        );
+        map.put(SystemConstant.EMPI_SECONDARY_KEY, secondarySamples);
+        // 1.0暂时不加入字典
+        // 纳排属性
+        //获取纳排属性
+        EmpiConfigExample selectionExample = new EmpiConfigExample();
+        selectionExample.createCriteria().andIsDeletedEqualTo(0).andConfigCodeEqualTo(SystemConstant.EMPI_SELECTION_KEY);
+        List<ValueProperty> selectionValueProperties = JSON.parseArray(empiConfigMapper.selectByExample(selectionExample).get(0).getValue()).toJavaList(ValueProperty.class);
+        List<ApiSample> selectionApiSamples = new ArrayList<>();
+        selectionValueProperties.forEach(
+                selectionValuePropert -> {
+                    selectionApiSamples.add(new ApiSample(SystemConstant.EMPI_SELECTION_KEY,
+                            selectionValuePropert.getCode()
+                            , selectionValuePropert.getValue(), ""));
+                }
+        );
+        //  分值匹配属性
+        map.put(SystemConstant.EMPI_SELECTION_KEY, selectionApiSamples);
+        log.info(CommonUtils.ObjectToJSONString(map));
+        //获取matchConfig
+        MatchFactorExample example2 = new MatchFactorExample();
+        example2.createCriteria().andIsDeletedEqualTo((short) 0);
+        List<MatchFactor> matchFactors = matchFactorMapper.selectByExample(example2);
+        //json样例 后期加入valueType
+        matchFactors.forEach(
+                matchFactor -> {
+                    map.put(matchFactor.getPropertyCode(), new ApiSample(matchFactor.getPropertyCode(), matchFactor.getPropertyCode(),
+                            matchFactor.getPropertyName(), ""));
+                }
+        );
+        return CommonResult.commomResult(map, HttpResultStatus.STATUS200);
+    }
+
+    /**
+     * 生成xml样例
+     * @return
+     */
+    @Override
+    public CommonResult<Object> createAPIXmlSample() {
+        return null;
+    }
 }

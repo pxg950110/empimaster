@@ -26,9 +26,10 @@ public interface ConfigService {
      * @param matchProperty
      * @return  true 返回添加或者修改属性 
      */
-    public CommonResult<Object> opeationMatchProperty(MatchProperty matchProperty);
+    public CommonResult<Object> operationMatchProperty(MatchProperty matchProperty);
 
-    
+
+    public CommonResult<Object> deleteMatchProperty(MatchProperty matchProperty);
     /**
      * 操作单个分值配置项
      * @param matchFactor
@@ -43,6 +44,13 @@ public interface ConfigService {
      */
     public CommonResult<Object>  operationMatchFactor(List<MatchFactor> matchFactors);
 
+
+    /**
+     * 删除单个属性配置分值
+     * @param matchFactor
+     * @return
+     */
+    public CommonResult<Object> deleteMatchFactor(MatchFactor matchFactor);
     /**
      * 获取所有分值配置项
      * @return
@@ -70,15 +78,28 @@ public interface ConfigService {
     /**
      * 疑似分值、合并分值、姓名匹配规则设置
      * @param code  
-     * @param grade
+     * @param matchProperties
      * @return
      */
-    public CommonResult<Object> setEmpiconfig(String  code ,String value); 
+    public CommonResult<Object> setEmpiconfig(String  code , List<MatchProperty> matchProperties);
 
 
     /**
      * 获取empi的配置
      * @return
      */
-    public CommonResult<Object> getEmpiConfig(); 
+    public CommonResult<Object> getEmpiConfig(String code);
+
+
+    /**
+     * 生成调用api的json样例
+     * @return
+     */
+    public CommonResult<Object> createAPIJsonSample();
+
+    /**
+     * 生成xml样例
+     * @return
+     */
+    public CommonResult<Object> createAPIXmlSample();
 }
