@@ -49,7 +49,7 @@
 <!--            <generatedKey column="id" sqlStatement="MySql" identity="true"/>-->
 <!--        </table>-->
 <!--        队列表-->
-        <table tableName="empi_config" schema="empi" >
+        <table tableName="match_property" schema="empi" >
             <!-- <generatedKey column="id" sqlStatement="MySql" identity="true"/> -->
         </table>
     

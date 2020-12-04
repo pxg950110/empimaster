@@ -664,6 +664,146 @@ public class MatchPropertyExample {
             addCriterion("sort not between", value1, value2, "sort");
             return (Criteria) this;
         }
+
+        public Criteria andValueTypeIsNull() {
+            addCriterion("value_type is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeIsNotNull() {
+            addCriterion("value_type is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeEqualTo(String value) {
+            addCriterion("value_type =", value, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeNotEqualTo(String value) {
+            addCriterion("value_type <>", value, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeGreaterThan(String value) {
+            addCriterion("value_type >", value, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("value_type >=", value, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeLessThan(String value) {
+            addCriterion("value_type <", value, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeLessThanOrEqualTo(String value) {
+            addCriterion("value_type <=", value, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeLike(String value) {
+            addCriterion("value_type like", value, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeNotLike(String value) {
+            addCriterion("value_type not like", value, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeIn(List<String> values) {
+            addCriterion("value_type in", values, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeNotIn(List<String> values) {
+            addCriterion("value_type not in", values, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeBetween(String value1, String value2) {
+            addCriterion("value_type between", value1, value2, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andValueTypeNotBetween(String value1, String value2) {
+            addCriterion("value_type not between", value1, value2, "valueType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeIsNull() {
+            addCriterion("code_system_code is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeIsNotNull() {
+            addCriterion("code_system_code is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeEqualTo(String value) {
+            addCriterion("code_system_code =", value, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeNotEqualTo(String value) {
+            addCriterion("code_system_code <>", value, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeGreaterThan(String value) {
+            addCriterion("code_system_code >", value, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeGreaterThanOrEqualTo(String value) {
+            addCriterion("code_system_code >=", value, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeLessThan(String value) {
+            addCriterion("code_system_code <", value, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeLessThanOrEqualTo(String value) {
+            addCriterion("code_system_code <=", value, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeLike(String value) {
+            addCriterion("code_system_code like", value, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeNotLike(String value) {
+            addCriterion("code_system_code not like", value, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeIn(List<String> values) {
+            addCriterion("code_system_code in", values, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeNotIn(List<String> values) {
+            addCriterion("code_system_code not in", values, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeBetween(String value1, String value2) {
+            addCriterion("code_system_code between", value1, value2, "codeSystemCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCodeSystemCodeNotBetween(String value1, String value2) {
+            addCriterion("code_system_code not between", value1, value2, "codeSystemCode");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

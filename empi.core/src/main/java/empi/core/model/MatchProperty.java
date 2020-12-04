@@ -5,8 +5,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class MatchProperty implements Serializable {
-
-    
     private Integer id;
 
     @ApiModelProperty(value = "属性代码")
@@ -32,6 +30,12 @@ public class MatchProperty implements Serializable {
 
     @ApiModelProperty(value = "序号")
     private Integer sort;
+
+    @ApiModelProperty(value = "值类型 valueString 数值 valueSystem  代码系统")
+    private String valueType;
+
+    @ApiModelProperty(value = "代码系统")
+    private String codeSystemCode;
 
     private static final long serialVersionUID = 1L;
 
@@ -107,6 +111,22 @@ public class MatchProperty implements Serializable {
         this.sort = sort;
     }
 
+    public String getValueType() {
+        return valueType;
+    }
+
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
+    }
+
+    public String getCodeSystemCode() {
+        return codeSystemCode;
+    }
+
+    public void setCodeSystemCode(String codeSystemCode) {
+        this.codeSystemCode = codeSystemCode;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -122,6 +142,8 @@ public class MatchProperty implements Serializable {
         sb.append(", updateBy=").append(updateBy);
         sb.append(", isDeleted=").append(isDeleted);
         sb.append(", sort=").append(sort);
+        sb.append(", valueType=").append(valueType);
+        sb.append(", codeSystemCode=").append(codeSystemCode);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

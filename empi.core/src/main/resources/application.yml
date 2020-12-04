@@ -1,5 +1,11 @@
+http:
+  port: 80
 server:
   port: 9000
+  ssl:
+    key-store: classpath:4870328_pxgandppm.top.pfx
+    key-store-type: PKCS12
+    key-store-password: WSRK1ksM
 autoconfig:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver

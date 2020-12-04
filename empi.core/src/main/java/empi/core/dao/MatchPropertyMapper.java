@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 public interface MatchPropertyMapper {
     long countByExample(MatchPropertyExample example);
-
+    Integer queryMaxSort();
     int deleteByExample(MatchPropertyExample example);
 
     int deleteByPrimaryKey(Integer id);
@@ -27,6 +27,4 @@ public interface MatchPropertyMapper {
     int updateByPrimaryKeySelective(MatchProperty record);
 
     int updateByPrimaryKey(MatchProperty record);
-
-    Integer queryMaxSort();
 }
